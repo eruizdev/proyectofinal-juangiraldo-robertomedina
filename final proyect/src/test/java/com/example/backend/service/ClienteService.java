@@ -1,24 +1,27 @@
-package com.example.backend.repository;
+package com.example.backend.service;
 
+import com.example.backend.dto.ClienteDTO;
 import com.example.backend.model.Cliente;
-import org.springframework.stereotype.Repository;
-import java.util.*;
+import com.example.backend.repository.ClienteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.concurrent.atomic.AtomicLong;
 
-@Repository
-public class ClienteRepository {
-    private Map<Long, Cliente> clientes = new HashMap<>();
-    private List<Cliente> historial = new ArrayList<>();
+@Service
+public class ClienteService {
 
-    public void save(Cliente cliente) {
-        clientes.put(cliente.getId(), cliente);
-        historial.add(cliente);
+    @Autowired
+    private ClienteRepository clienteRepository;
+
+    private AtomicLong idGenerator = new AtomicLong(1);
+
+    public void guardarCliente(ClienteDTO clienteDTO) {
+        Long id = idGenerator.getAndIncrement();
+        Cliente cliente = new Cliente(id, clienteDTO.getNombre(), clienteDTO.getTelefono(), clienteDTO.getCorreo(), clienteDTO.getNombreMascota());
+        clienteRepository.save(cliente);
     }
 
-    public List<Cliente> findAll() {
-        return new ArrayList<>(clientes.values());
-    }
-
-    public List<Cliente> getHistorial() {
-        return historial;
+    public java.util.List<Cliente> obtenerHistorial() {
+        return clienteRepository.getHistorial();
     }
 }
